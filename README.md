@@ -1,77 +1,255 @@
-Desafio DIO: Engenharia Reversa e Especialização em C/Assembly
-1. Contexto e Objetivos
+# Reverse Engineering Study Notebook
 
-Este projeto consiste na criação de um Caderno Temático no NotebookLM focado em Engenharia Reversa e na relação intrínseca entre as linguagens C e Assembly (x86/x64).
+> Curated study notebook focused on Reverse Engineering, Computer Architecture, C Programming, and x86/x64 Assembly.
 
-Objetivos de Estudo:
+## Overview
 
-    Compreender o funcionamento interno de binários e como o código de alto nível (C) é traduzido para instruções de máquina.
+This project was created as part of a study challenge focused on understanding how software works internally, from high-level C code down to machine instructions executed by the processor.
 
-    Dominar a análise de fluxo de execução, registradores e convenções de chamada (calling conventions).
+The notebook centralizes references, study notes, reverse engineering workflows, troubleshooting experiences, and reusable prompts for practical analysis using industry-standard tools.
 
-    Explorar o futuro da engenharia reversa frente a novas arquiteturas e sistemas de segurança.
+---
 
-    Aprender a utilizar ferramentas consagradas da área como Ghidra, IDA Free, Cutter e GDB.
+## Study Objectives
 
-2. Curadoria de Fontes
+- Understand how C code is translated into Assembly.
+- Analyze binary execution flow and program internals.
+- Learn processor architecture concepts such as:
+  - Registers
+  - Stack and Heap
+  - Calling Conventions
+  - Syscalls
+- Reverse engineer compiled software.
+- Identify compiler optimizations and their impact on binary analysis.
+- Develop practical skills with professional reverse engineering tools.
 
-Para alimentar o NotebookLM, selecionei as seguintes fontes fundamentais:
+---
 
-    "Computer Systems: A Programmer's Perspective" (CS:APP) - Randal E. Bryant & David R. O'Hallaron. (Referência acadêmica sobre como o hardware e software interagem).
+## Technologies & Tools
 
-    "The Art of Assembly Language" - Randall Hyde. (Guia completo para entender a lógica por trás do processador).
+| Category | Tools |
+|-----------|---------|
+| Reverse Engineering | Ghidra, IDA Free, Cutter |
+| Debugging | GDB |
+| Programming Languages | C, Assembly (x86/x64) |
+| Operating System | Linux |
+| Documentation | NotebookLM |
 
-    "Linux System Programming: Talking Directly to the Kernel" - Robert Love. (Essencial para entender Syscalls e o comportamento do sistema operacional sob o capô).
+---
 
-3. Engenharia de Prompts e "Cicatrizes" (Troubleshooting)
+## Knowledge Sources
 
-Prompt Mestre Elaborado:
+### Computer Systems: A Programmer's Perspective (CS:APP)
 
-    "Explique o funcionamento interno do programa abaixo passo a passo, identificando fluxo de execução, chamadas de funções, estruturas de dados, uso de memória, registradores, convenções de chamada, algoritmos utilizados e possíveis otimizações do compilador. Sempre apresente exemplos práticos em C e Assembly x86/x64, diagramas ASCII quando necessário e explique como reproduzir a análise utilizando Ghidra, IDA Free, Cutter e GDB. Ao encontrar funções desconhecidas, descreva hipóteses fundamentadas sobre seu comportamento e o raciocínio utilizado para chegar à conclusão. O objetivo é aprendizado profundo de engenharia reversa e compreensão do funcionamento interno do software."
+Author: Randal E. Bryant & David R. O'Hallaron
 
-Desafios Encontrados (Troubleshooting):
+Provides a deep understanding of the interaction between hardware and software, memory organization, machine-level programming, and computer systems.
 
-    Dificuldade: Diferenciar o comportamento do entry point _start em relação ao main() da biblioteca padrão C (libc).
+### The Art of Assembly Language
 
-    Aprendizado: Entender que o _start é o ponto de entrada real do binário e que o main é apenas uma convenção de alto nível que depende de um ambiente configurado pelo crt0 (C Runtime Startup).
+Author: Randall Hyde
 
-    Insight: A análise de registradores (como RAX para syscalls) é o ponto de virada para identificar funções que o compilador "escondeu" ou otimizou.
+Comprehensive guide for understanding processor architecture and Assembly programming concepts.
 
-4. Miniguia de Estudo (Entrega Final)
-Resumo Estruturado
+### Linux System Programming
 
-A engenharia reversa é a arte de reconstruir o "porquê" de um software quando o código-fonte original não está disponível. A tradução C -> Assembly envolve:
+Author: Robert Love
 
-    Compilação: O código C é transformado em Assembly, onde variáveis viram posições de memória ou registradores.
+Focuses on Linux internals, system calls, kernel interaction, process management, and low-level programming.
 
-    Syscalls: A interface direta entre programa e SO. O registrador RAX dita a operação, enquanto outros registradores (RDI, RSI, RDX) carregam os argumentos.
+---
 
-    Otimização: Compiladores modernos (como gcc -O3) removem redundâncias, tornando a leitura do Assembly mais desafiadora por tentar ser mais eficiente que o código original.
+## Reverse Engineering Analysis Framework
 
-Glossário de Conceitos
+### Master Prompt
 
-    Syscall: Interface entre a aplicação e o Kernel do SO.
+```text
+Explain the internal behavior of the program step by step, identifying execution flow, function calls, data structures, memory usage, registers, calling conventions, algorithms, and possible compiler optimizations.
 
-    Registradores: Memória de ultra-alta velocidade dentro da CPU (ex: RAX, RDI, RSI).
+Provide practical examples in both C and x86/x64 Assembly whenever applicable.
 
-    Ghidra/IDA: Ferramentas que fazem o "Decompilation", tentando transformar código de máquina de volta em C legível.
+Include ASCII diagrams when useful and explain how to reproduce the analysis using Ghidra, IDA Free, Cutter, and GDB.
 
-    Convenção de Chamada: Regras sobre como argumentos são passados para funções (em x64 Linux, via registradores RDI, RSI, RDX, RCX, R8, R9).
+When encountering unknown functions, formulate evidence-based hypotheses and explain the reasoning process used to reach conclusions.
 
-    Seção .data: Área do binário dedicada a dados estáticos/globais.
+The objective is deep reverse engineering understanding and internal software analysis.
+```
 
-Prompts Reutilizáveis
+---
 
-    "Analise o seguinte bloco de código Assembly e tente reconstruir a assinatura da função equivalente em C, identificando se os parâmetros são passados via pilha ou registradores."
+## Troubleshooting & Lessons Learned
 
-    "Explique a diferença entre uma chamada de função (call) e uma chamada de sistema (syscall) neste trecho de código."
+### Understanding `_start` vs `main`
 
-    "Identifique, neste binário, qualquer padrão que indique o uso de técnicas de proteção ou ofuscação (ex: anti-debugging)."
+#### Challenge
 
-Como reproduzir a análise:
+Distinguishing the role of the binary entry point (`_start`) from the application's `main()` function.
 
-    GDB: Use break _start para ver o início da execução e stepi para analisar instrução por instrução.
+#### Key Learning
 
-    Ghidra: Importe o binário e utilize o grafo de fluxo de controle para visualizar os saltos (jmp) e condições (jne/je).
+`_start` is the true entry point of an executable.
 
-Dica de estudo: A prática leva à perfeição. Tente compilar códigos simples com diferentes níveis de otimização (-O0, -O2, -O3) e compare como o Assembly gerado muda!
+Before `main()` is executed, the runtime environment is initialized by the C Runtime Startup (CRT), which prepares memory structures and program state.
+
+#### Insight
+
+Monitoring register usage—especially `RAX` during syscalls—often reveals functionality hidden by compiler optimizations.
+
+---
+
+## Core Concepts
+
+### Compilation
+
+C source code is translated into Assembly instructions before becoming machine code.
+
+Variables may become:
+
+- CPU registers
+- Stack locations
+- Static memory addresses
+
+### System Calls (Syscalls)
+
+Direct communication channel between user-space applications and the operating system kernel.
+
+Example registers on Linux x64:
+
+| Register | Purpose |
+|-----------|----------|
+| RAX | Syscall number |
+| RDI | Argument 1 |
+| RSI | Argument 2 |
+| RDX | Argument 3 |
+
+### Compiler Optimization
+
+Optimization levels such as:
+
+```bash
+-O0
+-O1
+-O2
+-O3
+```
+
+can significantly alter generated Assembly code, often removing redundant operations and restructuring control flow.
+
+---
+
+## Glossary
+
+### Syscall
+
+Interface between a user-space application and the operating system kernel.
+
+### Registers
+
+Ultra-fast storage locations inside the CPU.
+
+Examples:
+
+- RAX
+- RBX
+- RCX
+- RDX
+- RDI
+- RSI
+
+### Calling Convention
+
+Rules that define how functions receive parameters and return values.
+
+Linux x64 argument order:
+
+```text
+RDI → Argument 1
+RSI → Argument 2
+RDX → Argument 3
+RCX → Argument 4
+R8  → Argument 5
+R9  → Argument 6
+```
+
+### `.data` Section
+
+Binary section dedicated to initialized global and static variables.
+
+---
+
+## Reusable Reverse Engineering Prompts
+
+### Function Reconstruction
+
+```text
+Analyze the Assembly code below and reconstruct the equivalent C function signature. Identify parameter passing mechanisms and return values.
+```
+
+### Syscall Analysis
+
+```text
+Explain the difference between a function call (call) and a system call (syscall) in the following code snippet.
+```
+
+### Binary Protection Detection
+
+```text
+Identify indicators of software protection mechanisms or obfuscation techniques, including anti-debugging patterns.
+```
+
+---
+
+## Reproducing Analyses
+
+### GDB
+
+Start analysis from the program entry point:
+
+```bash
+break _start
+run
+stepi
+```
+
+Useful commands:
+
+```bash
+info registers
+x/20i $rip
+layout asm
+```
+
+### Ghidra
+
+1. Import the binary.
+2. Run Auto Analysis.
+3. Inspect the Control Flow Graph.
+4. Analyze functions and decompiled output.
+5. Correlate Assembly with pseudocode.
+
+---
+
+## Study Recommendation
+
+Compile the same C program using different optimization levels:
+
+```bash
+gcc program.c -O0
+gcc program.c -O2
+gcc program.c -O3
+```
+
+Compare the generated Assembly and observe how compiler optimizations affect:
+
+- Control flow
+- Register usage
+- Function inlining
+- Memory access patterns
+
+This exercise provides one of the fastest paths toward mastering reverse engineering fundamentals.
+
+---
+
+## Project Goal
+
+Build a solid foundation in Reverse Engineering by understanding software behavior from source code to machine instructions, enabling deeper analysis of binaries, operating systems, and security-related technologies.
